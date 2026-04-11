@@ -1,61 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YouTube Downloader</title>
 
 <style>
+
 body{
-font-family:Arial;
+font-family: Arial, sans-serif;
 background:#0f172a;
 color:white;
-text-align:center;
-padding:20px;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
 }
 
-.container{
-max-width:500px;
-margin:auto;
+.box{
 background:#1e293b;
 padding:20px;
-border-radius:10px;
+border-radius:12px;
+width:90%;
+max-width:420px;
+text-align:center;
 }
 
 input{
-width:90%;
-padding:10px;
+width:100%;
+padding:12px;
+border-radius:8px;
 border:none;
-border-radius:5px;
+margin-top:10px;
 }
 
 button{
-padding:10px 20px;
 margin-top:10px;
-background:red;
-color:white;
-border:none;
-border-radius:5px;
-}
-
-img{
+padding:12px;
 width:100%;
-margin-top:15px;
-border-radius:10px;
+background:red;
+border:none;
+border-radius:8px;
+color:white;
+font-size:16px;
+cursor:pointer;
 }
-</style>
 
+button:hover{
+background:#cc0000;
+}
+
+.thumbnail{
+width:100%;
+border-radius:10px;
+margin-top:15px;
+}
+
+.loader{
+border:4px solid #ddd;
+border-top:4px solid red;
+border-radius:50%;
+width:30px;
+height:30px;
+animation:spin 1s linear infinite;
+margin:20px auto;
+display:none;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+</style>
 </head>
+
 <body>
 
-<h2>YouTube Downloader</h2>
+<div class="box">
 
-<div class="container">
+<h2>🎥 YouTube Downloader</h2>
 
-<input id="url" placeholder="Paste YouTube URL">
-
-<br>
+<input type="text" id="url" placeholder="Paste YouTube Link">
 
 <button onclick="getVideo()">Get Video</button>
+
+<div class="loader" id="loader"></div>
 
 <div id="result"></div>
 
@@ -67,31 +98,50 @@ async function getVideo(){
 
 let url=document.getElementById("url").value;
 
+if(!url){
+alert("Paste YouTube Link");
+return;
+}
+
+document.getElementById("loader").style.display="block";
+document.getElementById("result").innerHTML="";
+
 let api="https://apis.xcasper.space/api/downloader/yt-dl3?url="+encodeURIComponent(url);
+
+try{
 
 let res=await fetch(api);
 let data=await res.json();
 
 console.log(data);
 
-let thumb=data.thumbnail || "";
+document.getElementById("loader").style.display="none";
+
 let title=data.title || "Video";
-
-let downloadLink="";
-
-if(data.download){
-downloadLink=data.download;
-}else if(data.result){
-downloadLink=data.result.url;
-}
+let thumb=data.thumbnail || "";
+let download=data.download || data.url || "";
 
 document.getElementById("result").innerHTML=`
-<img src="${thumb}">
+
+<img src="${thumb}" class="thumbnail">
+
 <h3>${title}</h3>
-<a href="${downloadLink}">
-<button>Download Video</button>
+
+<a href="${download}" target="_blank">
+
+<button>⬇ Download Video</button>
+
 </a>
+
 `;
+
+}catch(e){
+
+document.getElementById("loader").style.display="none";
+
+document.getElementById("result").innerHTML="❌ Error loading video";
+
+}
 
 }
 
