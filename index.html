@@ -1,78 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YouTube Downloader</title>
 
 <style>
-
 body{
-font-family: Arial, sans-serif;
+font-family:Arial;
 background:#0f172a;
 color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-margin:0;
+text-align:center;
+padding:20px;
 }
 
 .box{
 background:#1e293b;
 padding:20px;
 border-radius:12px;
-width:90%;
 max-width:420px;
-text-align:center;
+margin:auto;
 }
 
 input{
 width:100%;
-padding:12px;
-border-radius:8px;
+padding:10px;
 border:none;
+border-radius:6px;
 margin-top:10px;
 }
 
 button{
 margin-top:10px;
-padding:12px;
+padding:10px;
 width:100%;
 background:red;
 border:none;
-border-radius:8px;
+border-radius:6px;
 color:white;
-font-size:16px;
 cursor:pointer;
-}
-
-button:hover{
-background:#cc0000;
 }
 
 .thumbnail{
 width:100%;
-border-radius:10px;
 margin-top:15px;
+border-radius:10px;
 }
 
 .loader{
-border:4px solid #ddd;
-border-top:4px solid red;
-border-radius:50%;
-width:30px;
-height:30px;
-animation:spin 1s linear infinite;
-margin:20px auto;
 display:none;
+margin-top:15px;
 }
-
-@keyframes spin{
-0%{transform:rotate(0deg);}
-100%{transform:rotate(360deg);}
-}
-
 </style>
 </head>
 
@@ -82,11 +60,11 @@ display:none;
 
 <h2>🎥 YouTube Downloader</h2>
 
-<input type="text" id="url" placeholder="Paste YouTube Link">
+<input id="url" placeholder="Paste YouTube Link">
 
 <button onclick="getVideo()">Get Video</button>
 
-<div class="loader" id="loader"></div>
+<div class="loader" id="loader">⏳ Loading...</div>
 
 <div id="result"></div>
 
@@ -98,17 +76,9 @@ async function getVideo(){
 
 let url=document.getElementById("url").value;
 
-if(!url){
-alert("Paste YouTube Link");
-return;
-}
-
 document.getElementById("loader").style.display="block";
-document.getElementById("result").innerHTML="";
 
 let api="https://apis.xcasper.space/api/downloader/yt-dl3?url="+encodeURIComponent(url);
-
-try{
 
 let res=await fetch(api);
 let data=await res.json();
@@ -117,9 +87,13 @@ console.log(data);
 
 document.getElementById("loader").style.display="none";
 
-let title=data.title || "Video";
+let title=data.title || "";
 let thumb=data.thumbnail || "";
-let download=data.download || data.url || "";
+let download="";
+
+if(data.links){
+download=data.links[0].url;
+}
 
 document.getElementById("result").innerHTML=`
 
@@ -127,21 +101,13 @@ document.getElementById("result").innerHTML=`
 
 <h3>${title}</h3>
 
-<a href="${download}" target="_blank">
+<a href="${download}" download>
 
 <button>⬇ Download Video</button>
 
 </a>
 
 `;
-
-}catch(e){
-
-document.getElementById("loader").style.display="none";
-
-document.getElementById("result").innerHTML="❌ Error loading video";
-
-}
 
 }
 
